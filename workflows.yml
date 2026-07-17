@@ -58,3 +58,28 @@ sle15sp6-branch:
     branches:
       only:
         - v10.0.0-sle15sp6
+
+
+sle15sp7-rebuild:
+  steps:
+    - trigger_services:
+        project: Devel:Virt:SLE-15-SP7:Staging
+        package: libvirt
+  filters:
+    event: push
+    branches:
+      only:
+        - v11.0.0-sle15sp7
+
+
+sle15sp7-branch:
+  steps:
+    - branch_package:
+        source_project: Devel:Virt:SLE-15-SP7:Staging
+        source_package: libvirt
+        target_project: Devel:Virt:SLE-15-SP7:Staging:PRs
+  filters:
+    event: pull_request
+    branches:
+      only:
+        - v11.0.0-sle15sp7
