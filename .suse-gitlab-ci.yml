@@ -117,3 +117,39 @@ test_sle15sp7:
     - echo "Starting test stage for SLE15 SP7"
     - /root/bin/run-test.sh
     - echo "Test stage finished"
+
+build_sle16sp0:
+  tags:
+    - sle16sp0
+  stage: build
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH =~ /.*-sle16.0/
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ /.*-sle16.0/
+  script:
+    - echo "Starting build stage for SLE16 SP0"
+    - /root/bin/wait-for-publish.sh api.suse.de Devel:Virt:SLE-16:Staging libvirt SLE_16 x86_64
+    - echo "Build stage finished"
+
+deploy_sle16sp0:
+  tags:
+    - sle16sp0
+  stage: deploy
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH =~ /.*-sle16.0/
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ /.*-sle16.0/
+  script:
+    - echo "Starting deploy stage for SLE16 SP0"
+    - /root/bin/deploy.sh virt_staging_repo http://rmt/repo/ibs/Devel:/Virt:/SLE-16:/Staging/SLE_16/
+    - echo "Deploy stage finished"
+
+test_sle16sp0:
+  tags:
+    - sle16sp0
+  stage: test
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH =~ /.*-sle16.0/
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ /.*-sle16.0/
+  script:
+    - echo "Starting test stage for SLE16 SP0"
+    - /root/bin/run-test.sh
+    - echo "Test stage finished"
