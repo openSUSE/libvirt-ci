@@ -108,3 +108,28 @@ sle16sp0-branch:
     branches:
       only:
         - v11.4.0-sle16.0
+
+
+sle16sp1-rebuild:
+  steps:
+    - trigger_services:
+        project: Devel:Virt:SLE-16-SP1:Staging
+        package: libvirt
+  filters:
+    event: push
+    branches:
+      only:
+        - v12.4.0-sle16.1
+
+
+sle16sp1-branch:
+  steps:
+    - branch_package:
+        source_project: Devel:Virt:SLE-16-SP1:Staging
+        source_package: libvirt
+        target_project: Devel:Virt:SLE-16-SP1:Staging:PRs
+  filters:
+    event: pull_request
+    branches:
+      only:
+        - v12.4.0-sle16.1

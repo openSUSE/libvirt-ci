@@ -111,3 +111,19 @@ deploy_sle16sp0:
   extends: [.deploy, .sle16sp0]
 test_sle16sp0:
   extends: [.test, .sle16sp0]
+
+
+.sle16sp1:
+  variables:
+    DISTRO: sle16sp1
+    LABEL: "SLE16 SP1"
+    OBS_PROJECT: Devel:Virt:SLE-16-SP1:Staging
+    OBS_REPO: SLE_16
+    BRANCH_RE: /.*-sle16.1/
+
+build_sle16sp1:
+  extends: [.build, .sle16sp1]
+deploy_sle16sp1:
+  extends: [.deploy, .sle16sp1]
+test_sle16sp1:
+  extends: [.test, .sle16sp1]
