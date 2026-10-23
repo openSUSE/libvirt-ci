@@ -8,148 +8,106 @@ stages:
   - test
 
 
-build_sle15sp5:
+# Per-stage job templates. Distro-specific values come from the distro
+# templates below via job-level variables.
+.distro-job:
   tags:
-    - sle15sp5
-  stage: build
+    - $DISTRO
   rules:
-    - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH =~ /.*-sle15sp5/
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ /.*-sle15sp5/
+    - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH =~ $BRANCH_RE
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ $BRANCH_RE
+
+.build:
+  extends: .distro-job
+  stage: build
   script:
-    - echo "Starting build stage for SLE15 SP5"
-    - /root/bin/wait-for-publish.sh api.suse.de Devel:Virt:SLE-15-SP5:Staging libvirt SUSE_SLE-15-SP5_Update_standard x86_64
+    - echo "Starting build stage for $LABEL"
+    - /root/bin/wait-for-publish.sh api.suse.de $OBS_PROJECT libvirt $OBS_REPO x86_64
     - echo "Build stage finished"
 
-deploy_sle15sp5:
-  tags:
-    - sle15sp5
+.deploy:
+  extends: .distro-job
   stage: deploy
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH =~ /.*-sle15sp5/
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ /.*-sle15sp5/
   script:
-    - echo "Starting deploy stage for SLE15 SP5"
-    - /root/bin/deploy.sh virt_staging_repo http://rmt/repo/ibs/Devel:/Virt:/SLE-15-SP5:/Staging/SUSE_SLE-15-SP5_Update_standard/
+    - echo "Starting deploy stage for $LABEL"
+    - "RMT_PROJECT=$(echo \"$OBS_PROJECT\" | sed 's|:|:/|g')"
+    - /root/bin/deploy.sh virt_staging_repo "http://rmt/repo/ibs/$RMT_PROJECT/$OBS_REPO/"
     - echo "Deploy stage finished"
 
-test_sle15sp5:
-  tags:
-    - sle15sp5
+.test:
+  extends: .distro-job
   stage: test
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH =~ /.*-sle15sp5/
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ /.*-sle15sp5/
   script:
-    - echo "Starting test stage for SLE15 SP5"
+    - echo "Starting test stage for $LABEL"
     - /root/bin/run-test.sh
     - echo "Test stage finished"
 
+
+# To add a distro, copy one block below and edit it.
+#   DISTRO:      runner tag
+#   LABEL:       name used in log messages
+#   OBS_PROJECT: OBS staging project
+#   OBS_REPO:    OBS repository name
+#   BRANCH_RE:   regex matching the distro's branches
+.sle15sp5:
+  variables:
+    DISTRO: sle15sp5
+    LABEL: "SLE15 SP5"
+    OBS_PROJECT: Devel:Virt:SLE-15-SP5:Staging
+    OBS_REPO: SUSE_SLE-15-SP5_Update_standard
+    BRANCH_RE: /.*-sle15sp5/
+
+build_sle15sp5:
+  extends: [.build, .sle15sp5]
+deploy_sle15sp5:
+  extends: [.deploy, .sle15sp5]
+test_sle15sp5:
+  extends: [.test, .sle15sp5]
+
+
+.sle15sp6:
+  variables:
+    DISTRO: sle15sp6
+    LABEL: "SLE15 SP6"
+    OBS_PROJECT: Devel:Virt:SLE-15-SP6:Staging
+    OBS_REPO: SUSE_SLE-15-SP6_Update_standard
+    BRANCH_RE: /.*-sle15sp6/
 
 build_sle15sp6:
-  tags:
-    - sle15sp6
-  stage: build
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH =~ /.*-sle15sp6/
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ /.*-sle15sp6/
-  script:
-    - echo "Starting build stage for SLE15 SP6"
-    - /root/bin/wait-for-publish.sh api.suse.de Devel:Virt:SLE-15-SP6:Staging libvirt SUSE_SLE-15-SP6_Update_standard x86_64
-    - echo "Build stage finished"
-
+  extends: [.build, .sle15sp6]
 deploy_sle15sp6:
-  tags:
-    - sle15sp6
-  stage: deploy
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH =~ /.*-sle15sp6/
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ /.*-sle15sp6/
-  script:
-    - echo "Starting deploy stage for SLE15 SP6"
-    - /root/bin/deploy.sh virt_staging_repo http://rmt/repo/ibs/Devel:/Virt:/SLE-15-SP6:/Staging/SUSE_SLE-15-SP6_Update_standard/
-    - echo "Deploy stage finished"
-
+  extends: [.deploy, .sle15sp6]
 test_sle15sp6:
-  tags:
-    - sle15sp6
-  stage: test
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH =~ /.*-sle15sp6/
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ /.*-sle15sp6/
-  script:
-    - echo "Starting test stage for SLE15 SP6"
-    - /root/bin/run-test.sh
-    - echo "Test stage finished"
+  extends: [.test, .sle15sp6]
 
+
+.sle15sp7:
+  variables:
+    DISTRO: sle15sp7
+    LABEL: "SLE15 SP7"
+    OBS_PROJECT: Devel:Virt:SLE-15-SP7:Staging
+    OBS_REPO: SUSE_SLE-15-SP7_Update_standard
+    BRANCH_RE: /.*-sle15sp7/
 
 build_sle15sp7:
-  tags:
-    - sle15sp7
-  stage: build
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH =~ /.*-sle15sp7/
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ /.*-sle15sp7/
-  script:
-    - echo "Starting build stage for SLE15 SP7"
-    - /root/bin/wait-for-publish.sh api.suse.de Devel:Virt:SLE-15-SP7:Staging libvirt SUSE_SLE-15-SP7_Update_standard x86_64
-    - echo "Build stage finished"
-
+  extends: [.build, .sle15sp7]
 deploy_sle15sp7:
-  tags:
-    - sle15sp7
-  stage: deploy
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH =~ /.*-sle15sp7/
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ /.*-sle15sp7/
-  script:
-    - echo "Starting deploy stage for SLE15 SP7"
-    - /root/bin/deploy.sh virt_staging_repo http://rmt/repo/ibs/Devel:/Virt:/SLE-15-SP7:/Staging/SUSE_SLE-15-SP7_Update_standard/
-    - echo "Deploy stage finished"
-
+  extends: [.deploy, .sle15sp7]
 test_sle15sp7:
-  tags:
-    - sle15sp7
-  stage: test
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH =~ /.*-sle15sp7/
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ /.*-sle15sp7/
-  script:
-    - echo "Starting test stage for SLE15 SP7"
-    - /root/bin/run-test.sh
-    - echo "Test stage finished"
+  extends: [.test, .sle15sp7]
+
+
+.sle16sp0:
+  variables:
+    DISTRO: sle16sp0
+    LABEL: "SLE16 SP0"
+    OBS_PROJECT: Devel:Virt:SLE-16:Staging
+    OBS_REPO: SLE_16
+    BRANCH_RE: /.*-sle16.0/
 
 build_sle16sp0:
-  tags:
-    - sle16sp0
-  stage: build
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH =~ /.*-sle16.0/
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ /.*-sle16.0/
-  script:
-    - echo "Starting build stage for SLE16 SP0"
-    - /root/bin/wait-for-publish.sh api.suse.de Devel:Virt:SLE-16:Staging libvirt SLE_16 x86_64
-    - echo "Build stage finished"
-
+  extends: [.build, .sle16sp0]
 deploy_sle16sp0:
-  tags:
-    - sle16sp0
-  stage: deploy
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH =~ /.*-sle16.0/
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ /.*-sle16.0/
-  script:
-    - echo "Starting deploy stage for SLE16 SP0"
-    - /root/bin/deploy.sh virt_staging_repo http://rmt/repo/ibs/Devel:/Virt:/SLE-16:/Staging/SLE_16/
-    - echo "Deploy stage finished"
-
+  extends: [.deploy, .sle16sp0]
 test_sle16sp0:
-  tags:
-    - sle16sp0
-  stage: test
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH =~ /.*-sle16.0/
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ /.*-sle16.0/
-  script:
-    - echo "Starting test stage for SLE16 SP0"
-    - /root/bin/run-test.sh
-    - echo "Test stage finished"
+  extends: [.test, .sle16sp0]
