@@ -88,7 +88,7 @@ sle15sp7-branch:
 sle16sp0-rebuild:
   steps:
     - trigger_services:
-        project: Devel:Virt:SLE-16:Staging
+        project: Devel:Virt:SLE-16.0:Staging
         package: libvirt
   filters:
     event: push
@@ -100,9 +100,9 @@ sle16sp0-rebuild:
 sle16sp0-branch:
   steps:
     - branch_package:
-        source_project: Devel:Virt:SLE-16:Staging
+        source_project: Devel:Virt:SLE-16.0:Staging
         source_package: libvirt
-        target_project: Devel:Virt:SLE-16:Staging:PRs
+        target_project: Devel:Virt:SLE-16.0:Staging:PRs
   filters:
     event: pull_request
     branches:
@@ -113,7 +113,7 @@ sle16sp0-branch:
 sle16sp1-rebuild:
   steps:
     - trigger_services:
-        project: Devel:Virt:SLE-16-SP1:Staging
+        project: Devel:Virt:SLE-16.1:Staging
         package: libvirt
   filters:
     event: push
@@ -125,9 +125,9 @@ sle16sp1-rebuild:
 sle16sp1-branch:
   steps:
     - branch_package:
-        source_project: Devel:Virt:SLE-16-SP1:Staging
+        source_project: Devel:Virt:SLE-16.1:Staging
         source_package: libvirt
-        target_project: Devel:Virt:SLE-16-SP1:Staging:PRs
+        target_project: Devel:Virt:SLE-16.1:Staging:PRs
   filters:
     event: pull_request
     branches:

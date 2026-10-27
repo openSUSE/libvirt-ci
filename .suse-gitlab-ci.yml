@@ -101,8 +101,8 @@ test_sle15sp7:
   variables:
     DISTRO: sle16sp0
     LABEL: "SLE16 SP0"
-    OBS_PROJECT: Devel:Virt:SLE-16:Staging
-    OBS_REPO: SLE_16
+    OBS_PROJECT: Devel:Virt:SLE-16.0:Staging
+    OBS_REPO: 16.0
     BRANCH_RE: /.*-sle16.0/
 
 build_sle16sp0:
@@ -117,8 +117,8 @@ test_sle16sp0:
   variables:
     DISTRO: sle16sp1
     LABEL: "SLE16 SP1"
-    OBS_PROJECT: Devel:Virt:SLE-16-SP1:Staging
-    OBS_REPO: SLE_16
+    OBS_PROJECT: Devel:Virt:SLE-16.1:Staging
+    OBS_REPO: 16.1
     BRANCH_RE: /.*-sle16.1/
 
 build_sle16sp1:
