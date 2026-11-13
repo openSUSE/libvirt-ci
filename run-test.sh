@@ -105,7 +105,7 @@ fi
 # Run the test
 libvirt_ver="$(rpm -q --queryformat "%{NAME} version %{VERSION}-%{RELEASE}" libvirt-libs)"
 echo "Testing $libvirt_ver on $hvisor hypervisor"
-/usr/bin/libvirt-tck
+podman run --pull=always --rm -it --privileged --net=host --pid=host -v /run/libvirt:/run/libvirt:rw -v /var/lib/libvirt:/var/lib/libvirt:rw  -v /var/cache/libvirt-tck:/var/cache/libvirt-tck:rw registry.opensuse.org/virtualization/tests/containerfile/virtualization-tests/libvirt-tck:latest --config /etc/libvirt-tck/default.yml
 
 retval=$?
 if [ $retval -eq 0 ]; then
